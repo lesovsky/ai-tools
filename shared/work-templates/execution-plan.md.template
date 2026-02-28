@@ -1,0 +1,29 @@
+# Execution Plan: {Feature Name}
+
+**Создан:** YYYY-MM-DD
+
+---
+
+## Wave 1 (независимые)
+
+### Task 01: [название]
+- **Skill:** code-writing
+- **Reviewers:** dev-code-reviewer, dev-security-auditor, dev-test-reviewer
+- **Verify:** curl — GET /api/endpoint → 200
+
+### Task 02: [название]
+- **Skill:** code-writing
+- **Reviewers:** dev-code-reviewer, dev-test-reviewer
+- **Verify:** user — пользователь проверяет UI
+
+## Wave 2 (зависит от Wave 1)
+
+### Task 03: [название]
+- **Skill:** code-writing
+- **Reviewers:** dev-code-reviewer, dev-security-auditor
+- **Verify:** bash — npm test
+
+## Проверки, требующие участия пользователя
+
+- [ ] Task 02: пользователь проверяет [что именно]
+- [ ] После всех волн: финальное тестирование

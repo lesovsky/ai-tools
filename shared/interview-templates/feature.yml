@@ -1,0 +1,229 @@
+# Interview Plan for Feature Planning
+#
+# Tracks progress of adaptive discovery interview for a new feature/bug/refactoring.
+# Updated after EACH user response with scoring, values, and remaining gaps.
+#
+# Location: {feature_base}-interview.yml
+#   e.g.  docs/features/001-feat-add-auth-interview.yml
+#
+# Scoring: 0-100% (how well we understand this aspect)
+# Status: pending → partial → complete
+# Required: true = must reach threshold, false = cover if relevant
+
+# ============================================================================
+# Interview Metadata (Session Recovery)
+# ============================================================================
+interview_metadata:
+  feature_name: ""      # kebab-case name, e.g. add-auth
+  feature_base: ""      # full path prefix, e.g. docs/features/001-feat-add-auth
+  work_type: ""         # feature | bug | refactoring
+  started: ""           # Timestamp (YYYY-MM-DD HH:MM:SS)
+  last_updated: ""
+  status: "not_started" # not_started | in_progress | completed
+  can_resume: true
+  current_question_num: 0
+  feature_size: ""      # S | M | L
+
+# ============================================================================
+# Conversation History (for session recovery)
+# ============================================================================
+# Preserves complete Q&A. Update after EVERY user response.
+#
+conversation_history: []
+# Format:
+# - question_num: 1
+#   timestamp: "2025-11-12 15:20:33"
+#   topic: "user_problem"
+#   agent_question: |
+#     [Full question text]
+#   user_answer: |
+#     [Full answer text]
+#   summary: "Brief summary"
+
+# ============================================================================
+# Phase 1: High-Level Feature Understanding
+# ============================================================================
+# Interview Cycle 1 scope
+phase1_feature_overview:
+
+  feature_description:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Need clear description + context"
+    required: true
+
+  user_problem:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "What pain point, why it matters"
+    required: true
+
+  target_users:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Who specifically will use this"
+    required: false
+
+  success_criteria:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "How we measure success (concrete, testable)"
+    required: true
+
+  constraints:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Technical/business constraints"
+    required: true
+
+  testing_strategy:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Integration tests needed? E2E? Why/why not?"
+    required: true
+
+# ============================================================================
+# Phase 2: User Experience & Scenarios
+# ============================================================================
+# Interview Cycle 2 scope (together with Phase 3)
+phase2_user_experience:
+
+  user_stories:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Step-by-step user interaction scenarios"
+    required: true
+
+  acceptance_criteria:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Testable checklist of what must work"
+    required: true
+
+  edge_cases:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Unusual scenarios, boundary conditions"
+    required: true
+
+  error_scenarios:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "What can go wrong, how to handle errors"
+    required: true
+
+  verification_strategy:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "How to verify feature works (agent and/or user)"
+    required: true
+
+  ui_ux_requirements:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Specific UI/UX requirements if applicable"
+    required: false
+
+  risks:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Risks and mitigations"
+    required: true
+
+  technical_decisions:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Key decisions (what we do/don't, why)"
+    required: false
+
+# ============================================================================
+# Phase 3: Integration & Technical Context
+# ============================================================================
+# Interview Cycle 2 scope (together with Phase 2)
+phase3_integration:
+
+  integration_points:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Where this fits in existing system"
+    required: true
+
+  dependencies:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Existing features/services this depends on"
+    required: false
+
+  data_requirements:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "What data needed, where from, how stored"
+    required: false
+
+  migration_needs:
+    score: 0
+    status: "pending"
+    value: ""
+    gaps: "Migration plan for existing users/data"
+    required: false
+
+# ============================================================================
+# Phase 4: Completion
+# ============================================================================
+phase4_completion:
+  userspec_file: ""  # e.g. docs/features/001-feat-add-auth.md
+  status: "pending"  # pending | created | approved
+
+# ============================================================================
+# Decision Rules
+# ============================================================================
+decision_rules:
+
+  required_threshold: 85
+  optional_threshold: 50
+
+  stop_criteria:
+    - "All required items in current cycle scope score >= 85%"
+    - "Structural: every required item has non-empty value, no TBD, gaps empty or conscious limitations"
+
+  question_strategy:
+    - "3-4 questions per batch about different gaps"
+    - "Run as many batches as needed — batch size is NOT cycle limit"
+    - "Propose solutions based on PK or code findings, not just ask questions"
+    - "Challenge with substance: counterexamples, code references, unexplored scenarios"
+    - "After each response: update scores, values, gaps, conversation_history, save"
+
+# ============================================================================
+# Progress
+# ============================================================================
+progress:
+  current_phase: "phase1_feature_overview"
+  questions_asked: 0
+  last_question: ""
+  completion_estimate: "0%"
+
+# ============================================================================
+# Notes
+# ============================================================================
+notes: |
+  Free-form notes:
+  - Important insights
+  - Areas of uncertainty
+  - Scope changes

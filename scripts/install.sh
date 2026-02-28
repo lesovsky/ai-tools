@@ -17,6 +17,7 @@ echo "Target: $CLAUDE_DIR"
 mkdir -p "$CLAUDE_DIR/agents"
 mkdir -p "$CLAUDE_DIR/skills"
 mkdir -p "$CLAUDE_DIR/commands"
+mkdir -p "$CLAUDE_DIR/shared"
 
 link_files() {
     local src_dir="$1"
@@ -49,6 +50,7 @@ link_files() {
 link_files "$REPO_DIR/agents"   "$CLAUDE_DIR/agents"   "agents"
 link_files "$REPO_DIR/skills"   "$CLAUDE_DIR/skills"   "skills"
 link_files "$REPO_DIR/commands" "$CLAUDE_DIR/commands"  "commands"
+link_files "$REPO_DIR/shared"   "$CLAUDE_DIR/shared"   "shared"
 
 # CLAUDE.md
 CLAUDE_MD_SRC="$REPO_DIR/CLAUDE.md"

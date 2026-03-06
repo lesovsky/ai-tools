@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ai-tools — архитектура команд, скиллов и агентов</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #fff; }
+    #chart { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="chart"></div>
+  <script>
+    var chart = echarts.init(document.getElementById('chart'));
+
+    var blue = '#3b82f6';
+    var green = '#22c55e';
+    var orange = '#f97316';
+    var gray = '#666';
+
+    function cmd(name, desc, children) {
+      return { name: name, description: desc, itemStyle: { color: blue, borderColor: blue }, children: children };
+    }
+
+    function skill(name, desc, children) {
+      return {
+        name: name,
+        description: desc,
+        itemStyle: { color: green, borderColor: green },
+        children: children || []
+      };
+    }
+
+    function agent(name, shortDesc, desc) {
+      return {
+        name: name,
+        shortDesc: shortDesc,
+        description: desc,
+        itemStyle: { color: orange, borderColor: orange }
+      };
+    }
+
+    var codeWritingAgents = [
+      agent('dev-code-reviewer', 'ревью кода', 'Проверяет архитектуру, читаемость, паттерны и типизацию написанного кода. Загружает методологию code-reviewing.'),
+      agent('dev-test-reviewer', 'ревью тестов', 'Анализирует качество тестов: покрытие, assertions, соответствие тест-пирамиде. Загружает методологию test-master.'),
+      agent('dev-security-auditor', 'аудит безопасности', 'Проверяет код на уязвимости по OWASP Top 10: инъекции, XSS, утечки секретов, проблемы аутентификации.')
+    ];
+
+    var data = {
+      name: 'ai-tools',
+      description: 'Фреймворк для AI-first разработки с Claude Code. Spec-Driven Development с автоматической валидацией на каждом этапе.',
+      itemStyle: { color: gray, borderColor: gray },
+      children: [
+        cmd('/new-user-spec', 'Запускает адаптивное интервью для сбора требований. Результат — пользовательская спецификация, согласованная с заказчиком.', [
+          skill('spec-writer', 'Проводит 4-фазное интервью: обзор фичи, пользовательский опыт, интеграция, уточнения. Формирует user-spec.md.', [
+            agent('dev-code-researcher', 'исследует код', 'Исследует существующую кодовую базу перед написанием спецификации. Находит точки входа, слой данных, похожие фичи.'),
+            agent('dev-interview-completeness-checker', 'полнота интервью', 'Оценивает полноту проведённого интервью. Выявляет пробелы и предлагает дополнительные вопросы.'),
+            agent('dev-userspec-quality-validator', 'валидация качества', 'Проверяет структуру и полноту документа: секции, критерии приёмки, граничные случаи, противоречия.'),
+            agent('dev-userspec-adequacy-validator', 'валидация адекватности', 'Оценивает адекватность предложенного решения: реализуемость, соответствие стеку, отсутствие over/under-engineering.')
+          ])
+        ]),
+        cmd('/new-tech-spec', 'Создаёт техническую спецификацию на основе утверждённого user-spec. Исследует код, принимает архитектурные решения.', [
+          skill('tech-spec-planning', 'Исследует кодовую базу, формирует архитектурные решения, план тестирования. Запускает 6 валидаторов параллельно.', [
+            agent('dev-code-researcher', 'исследует код', 'Глубоко исследует кодовую базу: entry points, data layer, существующие тесты, утилиты, потенциальные проблемы.'),
+            agent('dev-tech-spec-validator', 'валидация структуры', 'Проверяет соответствие tech-spec шаблону: наличие секций, корректность frontmatter, план верификации.'),
+            agent('dev-architect', 'проверка архитектуры', 'Оценивает архитектурное соответствие существующей кодовой базе: scalability, дизайн БД, coupling компонентов.'),
+            agent('dev-completeness-validator', 'проверка полноты', 'Двусторонняя трассировка user-spec и tech-spec. Находит пропущенные требования и несанкционированные добавления.'),
+            agent('dev-skeptic', 'поиск миражей', 'Проверяет факты в tech-spec против реального кода. Выявляет \"миражи\": несуществующие файлы, функции, зависимости.'),
+            agent('dev-security-auditor', 'аудит безопасности', 'Анализирует архитектурные решения tech-spec на безопасность. Проверяет аутентификацию, авторизацию, хранение данных.')
+          ])
+        ]),
+        cmd('/decompose-tech-spec', 'Разбивает утверждённый tech-spec на атомарные задачи. Каждая задача — один файл с TDD-якорем и списком ревьюеров.', [
+          skill('task-decomposition', 'Создаёт task-файлы параллельно, затем валидирует батчами. Задачи группируются в волны по зависимостям.', [
+            agent('dev-task-creator', 'создаёт задачи', 'Читает tech-spec и код, генерирует task-файлы по шаблону. Каждый файл содержит TDD Anchor, reviewers, skills.'),
+            agent('dev-task-validator', 'валидация задач', 'Проверяет task-файлы на соответствие шаблону: структура, качество контента, консистентность между задачами.'),
+            agent('dev-reality-checker', 'проверка реальности', 'Валидирует задачи против реальности кода: существуют ли указанные файлы и функции, реализуемы ли инструкции.')
+          ])
+        ]),
+        cmd('/do-feature', 'Выполняет все задачи фичи волнами. Параллельные задачи запускаются одновременно, после каждой волны — коммит.', [
+          skill('feature-execution', 'Оркестрирует выполнение как тимлид: группирует задачи в волны, управляет ревью-циклами (до 3 раундов), коммитит.', [
+            skill('code-writing', 'Цикл TDD для каждой задачи: сначала тест, потом реализация, затем автоматическое ревью тремя агентами.', JSON.parse(JSON.stringify(codeWritingAgents)))
+          ])
+        ]),
+        cmd('/do-task', 'Выполняет одну задачу из task-файла. Альтернатива /do-feature для пошагового выполнения задач.', [
+          skill('code-writing', 'Цикл TDD для каждой задачи: сначала тест, потом реализация, затем автоматическое ревью тремя агентами.', JSON.parse(JSON.stringify(codeWritingAgents)))
+        ]),
+        cmd('/write-code', 'Быстрое написание кода без фиче-менеджмента. Подходит для багфиксов, утилит, мелкого рефакторинга.', [
+          skill('code-writing', 'Цикл TDD для каждой задачи: сначала тест, потом реализация, затем автоматическое ревью тремя агентами.', JSON.parse(JSON.stringify(codeWritingAgents)))
+        ]),
+        cmd('/done', 'Финализация фичи: читает спецификации и решения, обновляет project-knowledge, архивирует директорию фичи.', [
+          skill('documentation-writing', 'Аудит и обновление документации проекта в .claude/skills/project-knowledge/. Проверяет консистентность с кодом.')
+        ])
+      ]
+    };
+
+    chart.setOption({
+      graphic: [
+        {
+          type: 'group',
+          left: 20,
+          top: 20,
+          children: [
+            { type: 'circle', shape: { r: 6 }, style: { fill: blue }, left: 0, top: 2 },
+            { type: 'text', style: { text: 'Команды', fontSize: 13, fontFamily: 'sans-serif', fill: '#333' }, left: 18, top: -3 },
+            { type: 'circle', shape: { r: 6 }, style: { fill: green }, left: 0, top: 24 },
+            { type: 'text', style: { text: 'Скиллы', fontSize: 13, fontFamily: 'sans-serif', fill: '#333' }, left: 18, top: 19 },
+            { type: 'circle', shape: { r: 6 }, style: { fill: orange }, left: 0, top: 46 },
+            { type: 'text', style: { text: 'Агенты', fontSize: 13, fontFamily: 'sans-serif', fill: '#333' }, left: 18, top: 41 }
+          ]
+        }
+      ],
+      tooltip: {
+        trigger: 'item',
+        formatter: function (params) {
+          var d = params.data;
+          if (d.description) {
+            return d.name + '<br/><i>' + d.description + '</i>';
+          }
+          return d.name;
+        }
+      },
+      series: [
+        {
+          type: 'tree',
+          data: [data],
+          layout: 'orthogonal',
+          orient: 'LR',
+          top: '5%',
+          left: '10%',
+          bottom: '5%',
+          right: '25%',
+          symbolSize: 10,
+          roam: true,
+          initialTreeDepth: -1,
+          label: {
+            position: 'top',
+            verticalAlign: 'bottom',
+            align: 'center',
+            fontSize: 13,
+            fontFamily: 'sans-serif'
+          },
+          leaves: {
+            label: {
+              position: 'right',
+              verticalAlign: 'middle',
+              align: 'left',
+              formatter: function (params) {
+                var d = params.data;
+                if (d.shortDesc) {
+                  return params.name + '  {desc|' + d.shortDesc + '}';
+                }
+                if (d.description) {
+                  return params.name + '  {desc|' + d.description + '}';
+                }
+                return params.name;
+              },
+              rich: {
+                desc: {
+                  color: '#999',
+                  fontSize: 11,
+                  fontStyle: 'italic'
+                }
+              }
+            }
+          },
+          lineStyle: {
+            width: 1.5,
+            color: '#ccc',
+            curveness: 0.5
+          },
+          emphasis: {
+            focus: 'descendant'
+          },
+          expandAndCollapse: true,
+          animationDuration: 550,
+          animationDurationUpdate: 750
+        }
+      ]
+    });
+
+    window.addEventListener('resize', function () {
+      chart.resize();
+    });
+  </script>
+</body>
+</html>

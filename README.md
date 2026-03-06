@@ -1,140 +1,248 @@
 # ai-tools
 
-Personal Claude Code toolkit: agents, skills, commands.
+Фреймворк для AI-first разработки с [Claude Code](https://docs.anthropic.com/en/docs/claude-code). Не претендует на универсальность — заточен именно под Claude Code и его экосистему (агенты, скиллы, команды).
 
-## Structure
+В основу разработки положен подход **Spec-Driven Development** — сначала детально планируем работу через адаптивное интервью, исследуем кодовую базу, формируем спецификацию, согласуем её с помощью специализированных валидаторов, и только потом пишем код. Сам код пишется через TDD и проходит автоматическое ревью агентами-рецензентами.
+
+## Архитектура
+
+Трёхслойная система: пользователь вызывает **команду**, команда запускает **скилл** (workflow с шагами и решениями), скилл порождает **агентов** (изолированные подпроцессы для ревью, валидации, исследования).
 
 ```
-ai-tools/
-├── agents/          # Specialized subprocesses (subagents)
-├── skills/          # Procedural skill instructions
-├── commands/        # Slash-commands (user-facing entry points)
-├── shared/          # Shared templates
-│   └── work-templates/
-├── scripts/
-│   └── install.sh   # Deploy to a new machine
-└── CLAUDE.md        # Global behavioral rules
+Пользователь вводит /команду
+     |
+Команда (commands/*.md) — точка входа
+     |
+Скилл (skills/*/SKILL.md) — workflow с шагами, циклами, решениями
+     |
+Агенты (agents/*.md) — специализированные подпроцессы
 ```
 
-## Domain prefixes
+Пользователь взаимодействует только с командами. Скиллы и агенты работают автоматически.
 
-Skills and agents use domain prefixes:
-- `dev-*` — software development
-- `mgmt-*` — team management
-- `comm-*` — communication, conflict resolution
-- `event-*` — workshops, talks, events
-
-## Install
+## Установка
 
 ```bash
+git clone <repo-url> ~/Projects/ai-tools
+cd ~/Projects/ai-tools
 ./scripts/install.sh
 ```
 
-Creates symlinks from `~/.claude/` into this repository.
+Скрипт создаёт симлинки из этого репозитория в `~/.claude/` (агенты, скиллы, команды, шаблоны, CLAUDE.md).
 
----
+## Быстрый старт
 
-## How to use
-
-### Three-layer architecture
+### Новый проект
 
 ```
-User types /command
-     ↓
-Command (commands/*.md) — thin wrapper, entry point
-     ↓
-Skill (skills/*/SKILL.md) — workflow with steps, decisions, loops
-     ↓
-Agents (agents/dev-*.md) — specialized subagents spawned via Task tool
+/init-project          # Создать проект из шаблона, инициализировать git, создать удалённый репозиторий
 ```
 
-**The user only interacts with `/commands`.** Skills and agents work automatically.
+После инициализации — заполнить документацию проекта через скилл `project-planning` (адаптивное интервью по архитектуре, стеку, паттернам, деплою).
 
----
+### Новая фича
 
-### Workflow
+```
+/new-user-spec         # Адаптивное интервью -> пользовательская спецификация
+/new-tech-spec         # Исследование кода + валидаторы -> техническая спецификация
+/decompose-tech-spec   # Разложить tech-spec на атомарные задачи
+/do-feature            # Выполнить все задачи волнами с ревью и коммитами
+/done                  # Обновить документацию проекта, архивировать фичу
+```
 
-#### New project
+### Быстрая задача без спецификации
 
-| Step | Command | What it does |
-|------|---------|--------------|
-| 1 | `/init-project` | Copy template, init git, create remote repository |
-| 2 | `project-planning` skill | Adaptive interview → fill project documentation |
+```
+/write-code            # TDD + ревью без overhead фиче-менеджмента
+```
 
-#### Adding a feature
+Подходит для багфиксов, утилит, мелкого рефакторинга, экспериментов.
 
-| Step | Command | What it does |
-|------|---------|--------------|
-| 1 | `/new-user-spec` | Adaptive interview → user specification |
-| 2 | `/new-tech-spec` | Code research + validators → technical specification |
-| 3 | `/decompose-tech-spec` | Split tech-spec into task files |
-| 4 | `/do-feature` | Execute all tasks by waves with reviews and commits |
-| ↳ | `/do-task` | Alternative: execute tasks one by one |
-| 5 | `/done` | Update project knowledge, archive feature |
+### Создание нового скилла
 
-#### Ad-hoc changes (bug fixes, small tweaks, refactoring)
+```
+Попросить Claude: "создай скилл для <задачи>"
+```
 
-| Command | What it does |
-|---------|--------------|
-| `/write-code` | TDD + reviews without feature management overhead |
+Автоматически активируется скилл `skill-master` — проведёт интервью, создаст структуру, валидирует результат через агента `dev-skill-checker`.
 
-Use when the change is too small to warrant a spec and decomposition: fixing a bug, adding a utility, small refactor, spike.
+## Методология
 
----
+### Документация проекта (Project Knowledge)
 
-### File naming convention
+Каждый проект содержит набор файлов в `.claude/skills/project-knowledge/`, которые Claude читает для понимания контекста:
 
-All feature artifacts share a common `feature_base` prefix:
+| Файл | Содержимое |
+|------|-----------|
+| `project.md` | Описание проекта, целевая аудитория, scope |
+| `architecture.md` | Стек, структура, зависимости, data model |
+| `patterns.md` | Конвенции кода, git workflow, бизнес-правила |
+| `deployment.md` | Платформа, переменные окружения, CI/CD, мониторинг |
+
+Документация заполняется при инициализации проекта (`project-planning`) и обновляется после завершения каждой фичи (`/done`).
+
+### Pipeline разработки фичи
+
+**Шаг 1. Пользовательская спецификация** (`/new-user-spec` -> скилл `spec-writer`)
+
+Адаптивное интервью в 4 фазы: обзор фичи, пользовательский опыт, интеграция, уточнения. Результат проверяется валидаторами качества (`dev-userspec-quality-validator`) и адекватности (`dev-userspec-adequacy-validator`). Пользователь утверждает финальную спецификацию.
+
+**Шаг 2. Техническая спецификация** (`/new-tech-spec` -> скилл `tech-spec-planning`)
+
+Исследование кодовой базы (`dev-code-researcher`), формирование архитектурных решений, план тестирования. Мультивалидаторное ревью: структура (`dev-tech-spec-validator`), архитектура (`dev-architect`), полнота (`dev-completeness-validator`), факты (`dev-skeptic`), безопасность (`dev-security-auditor`). Финальный gate — `dev-tech-lead` выносит вердикт GO / NEEDS WORK / NO-GO.
+
+**Шаг 3. Декомпозиция на задачи** (`/decompose-tech-spec` -> скилл `task-decomposition`)
+
+Tech-spec разбивается на атомарные task-файлы. Каждый файл содержит TDD-якорь, список ревьюеров, зависимости. Задачи проверяются валидаторами (`dev-task-validator`, `dev-reality-checker`).
+
+**Шаг 4. Выполнение** (`/do-feature` -> скилл `feature-execution`)
+
+Задачи выполняются волнами (параллельные группы без зависимостей). Каждая задача проходит цикл TDD: тест -> реализация -> ревью (`dev-code-reviewer`, `dev-test-reviewer`, `dev-security-auditor`). До 3 раундов ревью на задачу. После каждой волны — коммит.
+
+**Шаг 5. Финализация** (`/done` -> скилл `documentation-writing`)
+
+Чтение спецификаций и решений, обновление project-knowledge файлов, архивирование директории фичи в `docs/features/archive/`.
+
+### Инициализация нового проекта
+
+Команда `/init-project` создаёт проект из шаблона:
+- Копирует структуру `.claude/skills/project-knowledge/` с пустыми reference-файлами
+- Инициализирует git-репозиторий
+- Создаёт удалённый репозиторий (GitHub или GitLab)
+
+После инициализации скилл `project-planning` проводит адаптивное интервью и заполняет все файлы документации проекта за одну сессию.
+
+### Создание скиллов
+
+Скилл `skill-master` — гайд по созданию и обновлению скиллов. Два типа:
+
+- **Процедурные** — строгая последовательность фаз с чекпоинтами (code-writing, spec-writer)
+- **Информационные** — методология без строгого порядка, секции независимы (security-auditor, test-master)
+
+Структура скилла:
+```
+skill-name/
+├── SKILL.md              # Основной файл (frontmatter + инструкции)
+├── references/           # Детальная документация, загружается по необходимости
+├── scripts/              # Исполняемый код
+└── assets/               # Шаблоны, файлы для вывода
+```
+
+После создания скилл проверяется агентом `dev-skill-checker`. Для скиллов также доступна система тестирования: `skill-test-designer` проектирует сценарии, `skill-tester` выполняет их.
+
+### Соглашение об именовании файлов фичи
+
+Все артефакты фичи хранятся в общей директории с единым префиксом:
 
 ```
 docs/features/
 └── 001-feat-add-auth/
     ├── 001-feat-add-auth.md                   # user-spec
     ├── 001-feat-add-auth-tech-spec.md          # tech-spec
-    ├── 001-feat-add-auth-decisions.md          # decisions log
-    ├── 001-feat-add-auth-task-01.md            # task file
-    ├── 001-feat-add-auth-task-02.md
-    └── 001-feat-add-auth-task-01-dev-code-reviewer-review.json
+    ├── 001-feat-add-auth-decisions.md          # лог решений
+    ├── 001-feat-add-auth-task-01.md            # файл задачи
+    └── 001-feat-add-auth-task-02.md
 ```
 
-`feature_base` = `docs/features/001-feat-add-auth/001-feat-add-auth`
+## Справочник
 
----
+### Команды
 
-### Skills reference
+Пользователь вызывает команды через `/имя` в Claude Code.
 
-Skills are not called directly by the user — they are invoked by commands. Listed here for reference:
+| Команда | Что делает |
+|---------|-----------|
+| `/init-project` | Создать проект из шаблона, git, удалённый репозиторий |
+| `/new-user-spec` | Адаптивное интервью -> пользовательская спецификация |
+| `/new-tech-spec` | Исследование кода + валидаторы -> техническая спецификация |
+| `/decompose-tech-spec` | Разложить tech-spec на атомарные задачи |
+| `/do-feature` | Выполнить все задачи волнами с ревью и коммитами |
+| `/do-task` | Выполнить одну задачу из task-файла |
+| `/write-code` | TDD + ревью без фиче-менеджмента |
+| `/done` | Обновить документацию, архивировать фичу |
 
-| Skill | Called by | What it does |
-|-------|-----------|--------------|
-| `spec-writer` | `/new-user-spec` | Adaptive interview to capture requirements |
-| `tech-spec-planning` | `/new-tech-spec` | Code research, architecture decisions, multi-validator review |
-| `task-decomposition` | `/decompose-tech-spec` | Split tech-spec into atomic task files |
-| `feature-execution` | `/do-feature` | Orchestrate waves, spawn reviewers, manage review cycles |
-| `code-writing` | `/write-code`, `/do-task` | TDD cycle: test → implement → review |
-| `documentation-writing` | `/done` | Update project knowledge files |
-| `project-planning` | Manually (after `/init-project`) | Fill initial project documentation |
-| `deploy-pipeline` | Manually or via task | Configure CI/CD pipelines |
-| `infrastructure-setup` | Manually or via task | Setup dev infrastructure |
-| `prompt-master` | Manually | Write/improve LLM prompts |
-| `skill-master` | Manually | Create or update skills and agents |
+### Скиллы
 
----
+Скиллы вызываются командами или другими скиллами автоматически.
 
-### Agent reviewers
+| Скилл | Вызывается | Что делает |
+|-------|-----------|-----------|
+| `spec-writer` | `/new-user-spec` | Адаптивное интервью, формирование требований |
+| `tech-spec-planning` | `/new-tech-spec` | Исследование кода, архитектурные решения, мультивалидаторное ревью |
+| `task-decomposition` | `/decompose-tech-spec` | Разбиение tech-spec на атомарные task-файлы |
+| `feature-execution` | `/do-feature` | Оркестрация волн, ревью-циклы, коммиты |
+| `code-writing` | `/write-code`, `/do-task` | TDD-цикл: тест -> реализация -> ревью |
+| `documentation-writing` | `/done` | Аудит и обновление project-knowledge |
+| `project-planning` | После `/init-project` | Заполнение документации проекта через интервью |
+| `infrastructure-setup` | Вручную или из задачи | Настройка dev-инфраструктуры (Docker, pre-commit, тесты) |
+| `deploy-pipeline` | Вручную или из задачи | Настройка CI/CD (GitLab CI/CD, Docker Registry, VPS) |
+| `skill-master` | Вручную | Создание и обновление скиллов |
+| `skill-test-designer` | Вручную | Проектирование тестовых сценариев для скиллов |
+| `skill-tester` | Вручную | Выполнение тестовых сценариев скиллов |
+| `prompt-master` | Вручную | Написание и улучшение LLM-промптов |
+| `security-auditor` | Методология | Методология анализа безопасности (OWASP Top 10) |
+| `code-reviewing` | Методология | Методология code review (10 измерений) |
+| `test-master` | Методология | Методология тестирования (тест-пирамида) |
 
-Agents are spawned automatically by skills during execution. They are not called by the user directly.
+### Агенты
 
-| Agent | Triggered by | What it checks |
-|-------|-------------|----------------|
-| `dev-code-reviewer` | `code-writing` skill | Code quality: structure, patterns, naming, complexity |
-| `dev-security-auditor` | `code-writing` skill | OWASP Top 10, injections, auth, secrets |
-| `dev-test-reviewer` | `code-writing` skill | Test quality: coverage, assertions, test pyramid |
-| `dev-task-creator` | `task-decomposition` skill | Creates individual task files |
-| `dev-task-validator` | `task-decomposition` skill | Validates task files against template |
-| `dev-tech-spec-validator` | `tech-spec-planning` skill | Validates tech spec completeness |
-| `dev-userspec-quality-validator` | `spec-writer` skill | Checks user spec quality |
-| `dev-prompt-reviewer` | `code-writing` skill (prompt tasks) | Prompt quality |
-| `dev-skill-checker` | `skill-master` skill | Skill file compliance |
-| `dev-infrastructure-reviewer` | `infrastructure-setup` skill | Docker, pre-commit, folder structure |
-| `dev-deploy-reviewer` | `deploy-pipeline` skill | CI/CD pipeline quality |
+Агенты порождаются скиллами автоматически. Пользователь их не вызывает напрямую.
+
+| Агент | Когда работает | Что проверяет |
+|-------|---------------|--------------|
+| `dev-code-reviewer` | После написания кода | Архитектура, читаемость, типизация, паттерны |
+| `dev-test-reviewer` | После написания кода | Качество тестов, покрытие, тест-пирамида |
+| `dev-security-auditor` | После написания кода / ревью tech-spec | OWASP Top 10, инъекции, секреты |
+| `dev-prompt-reviewer` | После написания промптов | Ясность, структура, устойчивость к инъекциям |
+| `dev-code-researcher` | При создании tech-spec | Исследование кодовой базы перед реализацией |
+| `dev-userspec-quality-validator` | При создании user-spec | Структура, полнота, тестируемость критериев |
+| `dev-userspec-adequacy-validator` | При создании user-spec | Адекватность решения, feasibility |
+| `dev-customer` | При создании user-spec | Бизнес-ценность, clarity, scope |
+| `dev-interview-completeness-checker` | При создании user-spec | Полнота интервью, пробелы |
+| `dev-tech-spec-validator` | При создании tech-spec | Соответствие шаблону, секции, frontmatter |
+| `dev-architect` | При создании tech-spec | Архитектурное соответствие кодовой базе |
+| `dev-completeness-validator` | При создании tech-spec | Traceability user-spec <-> tech-spec |
+| `dev-skeptic` | При создании tech-spec | Факты против реального кода (выявление "миражей") |
+| `dev-tech-lead` | Финальный gate | GO / NEEDS WORK / NO-GO вердикт |
+| `dev-task-creator` | При декомпозиции | Создание task-файлов из tech-spec |
+| `dev-task-validator` | При декомпозиции | Валидация task-файлов против шаблона |
+| `dev-reality-checker` | При декомпозиции | Проверка task-файлов против реальности кода |
+| `dev-skill-checker` | При создании скилла | Соответствие стандартам качества |
+| `dev-infrastructure-reviewer` | При настройке инфраструктуры | Docker, pre-commit, структура, .gitignore |
+| `dev-deploy-reviewer` | При настройке CI/CD | Качество pipeline, секреты, конфигурация |
+| `dev-documentation-reviewer` | При обновлении документации | Качество project-knowledge |
+
+### Доменные префиксы
+
+Скиллы и агенты используют доменные префиксы для организации:
+
+| Префикс | Область |
+|---------|--------|
+| `dev-*` | Разработка ПО |
+
+## Структура репозитория
+
+```
+ai-tools/
+├── agents/           # 21 специализированный агент
+├── skills/           # 17 скиллов (workflow + методологии)
+├── commands/         # 9 пользовательских команд
+├── shared/
+│   ├── work-templates/       # Шаблоны артефактов (user-spec, tech-spec, tasks, decisions)
+│   ├── interview-templates/  # Шаблоны адаптивного интервью
+│   └── templates/
+│       └── new-project/      # Шаблон нового проекта
+├── scripts/
+│   └── install.sh            # Установка симлинков в ~/.claude/
+└── CLAUDE.md                 # Глобальные правила поведения
+```
+
+## Лицензия
+
+Свободное распространение. Можно форкать, изменять и использовать без ограничений.
+
+## Авторы
+
+Алексей Лесовский — сборка, адаптация, дополнения.
+
+Фреймворк основан на наработках [Павла Молянова](https://github.com/pavel-molyanov/molyanov-ai-dev) — архитектура команд, методологии валидации, выполнение задач волнами, создание скиллов и другие интересные и полезные вещи.

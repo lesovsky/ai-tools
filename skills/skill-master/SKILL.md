@@ -222,6 +222,10 @@ Words like CRITICAL, MANDATORY, NEVER, IMPORTANT, MUST are anti-patterns.
 
 **Hard limit:** Maximum one emphasis word per skill. Ideal: zero.
 
+### No Hardcoded Paths
+
+Skills, agents, and commands in ai-tools are portable — they work across different machines and environments. Environment-specific paths (`~/Git/notes/...`, `~/Projects/foo/bar.md`) belong in the target project's own documentation (e.g. `project-knowledge/references/deployment.md`), not in skill instructions. Skills should read paths from project documentation at runtime.
+
 ### Delegating Heavy Work
 
 If skill has context-heavy tasks (reviews, research, validation):
@@ -244,6 +248,7 @@ If skill has context-heavy tasks (reviews, research, validation):
 - [ ] SKILL.md < 500 lines
 - [ ] All referenced files exist
 - [ ] No extra docs (README, CHANGELOG)
+- [ ] No hardcoded environment-specific paths (home dirs, local vaults, user-specific directories). Project-specific paths belong in the project's own documentation (e.g. project-knowledge), not in portable skills/agents/commands.
 - [ ] References contain only conditional content (not needed on every execution path)
 - [ ] References linked as action steps or with condition + contents (no passive links, no resource catalogs at end of file)
 - [ ] Uses positive instructions (not "don't do X")

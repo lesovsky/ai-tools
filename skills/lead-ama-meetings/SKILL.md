@@ -11,7 +11,9 @@ description: |
 
 Interactive interview → full speech conspect → save to Obsidian.
 
-**Output:** `~/Git/notes/WORK/01.Встречи/Регулярные/AskMeAnything/AMA YYYY-MM-DD.md`
+**Paths are project-specific.** Before starting, read paths from the project's documentation:
+`{project_dir}/.claude/skills/project-knowledge/references/deployment.md` → section "Paths".
+The project directory is the current working directory.
 
 ## Interview Style
 
@@ -28,8 +30,8 @@ Conduct interview in Russian. Be a co-thinker who helps structure thoughts, not 
 
 ### Phase 1: Context Loading
 
-1. Read todo file: `~/Projects/ama-meetings/todo.md`
-2. Find the latest conspect in `~/Git/notes/WORK/01.Встречи/Регулярные/AskMeAnything/` — read it for continuity (previous topics, open threads, promised follow-ups).
+1. Read the todo file (path from deployment.md → "Paths").
+2. Find the latest conspect in the conspect output directory (path from deployment.md → "Paths") — read it for continuity (previous topics, open threads, promised follow-ups).
 3. Determine the next AMA number from the latest conspect heading (e.g., if last was `AMA #1`, next is `AMA #2`).
 4. Determine the meeting date — ask the lead or use the upcoming week's date.
 
@@ -153,7 +155,7 @@ Each major topic gets a block with:
 1. Show the full conspect to the lead.
 2. Ask: "Хочешь что-то изменить, добавить или убрать?"
 3. Iterate until the lead approves.
-4. Save to: `~/Git/notes/WORK/01.Встречи/Регулярные/AskMeAnything/AMA YYYY-MM-DD.md`
+4. Save to the conspect output directory (path from deployment.md) as `AMA YYYY-MM-DD.md`
 5. Clear todo.md — replace content with the empty template:
    ```
    # AMA ToDo

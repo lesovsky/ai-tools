@@ -1,0 +1,29 @@
+# docker-compose.override.yml — local mounts and customizations
+# Copy to ~/Projects/openclaw/docker-compose.override.yml
+# Docker Compose picks this up automatically alongside docker-compose.yml
+
+services:
+  openclaw-gateway:
+    volumes:
+      # Obsidian vault (read-only)
+      - /home/USER/Git/notes:/home/node/obsidian:ro
+    environment:
+      IMAP_HOST: ${IMAP_HOST}
+      IMAP_PORT: ${IMAP_PORT:-993}
+      IMAP_USER: ${IMAP_USER}
+      IMAP_PASSWORD: ${IMAP_PASSWORD}
+      CONFLUENCE_URL: ${CONFLUENCE_URL}
+      CONFLUENCE_TOKEN: ${CONFLUENCE_TOKEN}
+      CONFLUENCE_SPACE: ${CONFLUENCE_SPACE}
+
+  openclaw-cli:
+    volumes:
+      - /home/USER/Git/notes:/home/node/obsidian:ro
+    environment:
+      IMAP_HOST: ${IMAP_HOST}
+      IMAP_PORT: ${IMAP_PORT:-993}
+      IMAP_USER: ${IMAP_USER}
+      IMAP_PASSWORD: ${IMAP_PASSWORD}
+      CONFLUENCE_URL: ${CONFLUENCE_URL}
+      CONFLUENCE_TOKEN: ${CONFLUENCE_TOKEN}
+      CONFLUENCE_SPACE: ${CONFLUENCE_SPACE}

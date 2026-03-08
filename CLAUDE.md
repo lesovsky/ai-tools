@@ -16,6 +16,7 @@
 - Never commit secrets, tokens, passwords to git
 - Never log sensitive data (passwords, API keys, PII)
 - All deployments via CI/CD only (no manual deploys to production)
+- gitleaks pre-commit hook is required — see README for setup instructions
 
 ## Agents & Skills
 

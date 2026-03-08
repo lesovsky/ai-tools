@@ -30,6 +30,27 @@ cd ~/Projects/ai-tools
 
 Скрипт создаёт симлинки из этого репозитория в `~/.claude/` (агенты, скиллы, команды, шаблоны, CLAUDE.md).
 
+### Требования к окружению
+
+**gitleaks** — обязательный инструмент для проверки секретов перед коммитом:
+
+```bash
+sudo apt-get install -y gitleaks   # Ubuntu/Debian
+brew install gitleaks              # macOS
+```
+
+После установки настрой pre-commit хук в репозитории:
+
+```bash
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+gitleaks protect --staged --redact -v
+EOF
+chmod +x .git/hooks/pre-commit
+```
+
+Хук блокирует коммит если в staged-файлах найдены секреты (API ключи, токены, пароли).
+
 ## Быстрый старт
 
 ### Новый проект

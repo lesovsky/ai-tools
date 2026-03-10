@@ -18,6 +18,9 @@ actively proposes solutions and challenges weak answers.
 - 3-4 questions per batch. Run as many batches as needed until the cycle's items are fully covered.
 - Propose solutions based on Project Knowledge (if available) and code findings:
   "В architecture.md описан паттерн X — думаю, здесь нужно Y. Согласен?"
+- For user stories and UI/UX — take initiative: propose scenarios and interface structures the user
+  may not have considered. User's picture is often incomplete. Fill the gaps with concrete suggestions,
+  get confirmation or correction: "Я бы добавил сценарий [X] — это распространённый кейс. Нужен?"
 - Challenge with substance — concrete counterexamples, code references, unexplored scenarios:
   "А что если пользователь сделает Z? В коде модуль Q не обрабатывает этот случай."
 - Accept the answer after one substantive challenge and move on.
@@ -86,6 +89,20 @@ If during later phases a gap is discovered — launch `dev-code-researcher` agai
 2. Questions based on code findings: "Нашёл модуль X, который делает Y — переиспользуем?"
 3. Run **Interview Loop** on `phase2_user_experience` + `phase3_integration` items.
 
+**Must cover in this cycle (required, not optional):**
+
+- **User stories:** For every key user story — get a concrete step-by-step scenario.
+  Don't just extract — actively propose stories the user may not have thought of:
+  "Мне кажется, здесь ещё может быть сценарий [X] — когда пользователь хочет [Y]. Добавляем?"
+  Probe vague answers: "Ты сказал 'нажимает кнопку' — какую именно, где она, что происходит дальше?"
+  Minimum 2-3 stories. Aim to cover all distinct usage patterns.
+
+- **UI/UX:** For every user-facing feature — actively propose interface structure, don't wait for user to describe it.
+  Lead with a concrete suggestion: "Я бы сделал так: [страница X] со списком [Y], кнопка [Z] открывает форму. Что думаешь?"
+  Cover: pages/screens, key components, forms (fields + validation), loading/empty/error states, navigation.
+  If no UI (API/CLI): propose command format and output structure, get confirmation.
+  Your ideas are welcome input — user may not have a clear picture yet, help them shape it.
+
 ### Phase 5: Cycle 3 — Review & Finalize
 
 **Scope:** ALL items across all phases still below threshold.
@@ -93,6 +110,9 @@ If during later phases a gap is discovered — launch `dev-code-researcher` agai
 Cleanup pass: revisit anything not fully covered in Cycles 1-2.
 Deepen edge cases and error scenarios — probe for scenarios user hasn't considered,
 even if items formally passed threshold.
+
+**Special attention:** If `user_stories` or `ui_ux_requirements` are below 85% — treat as blockers.
+Do not proceed to Phase 6 until both are complete.
 
 Run **Interview Loop** on remaining gaps.
 
@@ -112,6 +132,11 @@ Launch `dev-interview-completeness-checker` subagent (Task tool) with `feature_b
    **Content rules:**
    - "Что делаем" — self-contained, understandable without the interview
    - "Зачем" — concrete user value, not "улучшить UX"
+   - "Пользовательские истории" — real stories in "Как [роль], я хочу [действие], чтобы [результат]" format.
+     Each story must have a matching step-by-step scenario below.
+   - "Дизайн и интерфейс" — concrete description of pages, components, forms.
+     No "удобный интерфейс" — only specific elements and behaviors.
+     For API/CLI features: describe command syntax and output format instead.
    - Acceptance criteria — testable, no "работает корректно"
    - Every discussed topic from interview must appear in the spec
 3. If feature seems large (>10 criteria, >3 user flows, >5 integrations) — suggest splitting.

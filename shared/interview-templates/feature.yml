@@ -98,7 +98,7 @@ phase2_user_experience:
     score: 0
     status: "pending"
     value: ""
-    gaps: "Step-by-step user interaction scenarios"
+    gaps: "User stories (As a [role], I want [action], so that [benefit]) + step-by-step use case scenarios for each story"
     required: true
 
   acceptance_criteria:
@@ -133,8 +133,8 @@ phase2_user_experience:
     score: 0
     status: "pending"
     value: ""
-    gaps: "Specific UI/UX requirements if applicable"
-    required: false
+    gaps: "Pages/screens, key components, forms with fields and validation, UX behavior (loading states, empty states, error messages, navigation)"
+    required: true
 
   risks:
     score: 0

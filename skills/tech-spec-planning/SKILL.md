@@ -7,7 +7,7 @@ description: Создаёт tech-spec.md через исследование к�
 
 Code research → adaptive clarification → tech-spec.md → multi-validator review → user approval.
 
-**Input:** `{feature_base}.md` (user-spec) + Project Knowledge
+**Input:** `{feature_base}.md` (user-spec) + Project Knowledge + ADR log + Tech Debt register
 **Output:** `{feature_base}-tech-spec.md` (approved)
 **Language:** Technical documentation in English, communication in Russian
 
@@ -21,11 +21,20 @@ Code research → adaptive clarification → tech-spec.md → multi-validator re
 3. Read all files in `~/.claude/skills/project-knowledge/references/` (project.md, architecture.md, patterns.md, deployment.md, etc.).
    If directory missing or empty — warn and continue without PK context.
 
-4. user-spec.md is the single input source — all requirements come from there.
+4. Read `docs/decisions-log.md` if it exists. Note ADR entries relevant to this feature's domain — they constrain architectural choices and prevent re-litigating settled decisions. If absent — note it and continue.
+
+5. Read `docs/tech-debt.md` if it exists. Note Active Debt items in areas this feature touches:
+   - Tech-spec must not worsen existing debt without explicit justification
+   - If the feature can resolve a debt item with little extra effort — propose it to the user in Phase 3
+   If absent — note it and continue.
+
+6. user-spec.md is the single input source — all requirements come from there.
 
 **Checkpoint:**
 - [ ] user-spec.md read, size extracted
 - [ ] Project Knowledge read (or warned that it's missing)
+- [ ] decisions-log.md read (relevant ADRs noted, or file absent)
+- [ ] tech-debt.md read (relevant debt noted, or file absent)
 
 ## Phase 2: Code Research
 
@@ -52,8 +61,18 @@ Analyze if additional information is needed based on user-spec and code research
 - If gaps found in user-spec requirements — discuss with user and update user-spec too.
 - If requirements are fundamentally unclear — suggest creating user-spec first.
 
+**External dependency validation rule:**
+If the feature depends on a specific external identifier (API field name, endpoint path,
+response format, webhook event type, config key, etc.) — verify it against real data
+**before** writing the tech-spec. Make a live API call, inspect a real response, or ask
+the user to confirm the exact value. If verification is impossible (no access, env not
+ready), explicitly mark it as a risk in the tech-spec Risks section with:
+"Unverified external dependency: [what] — assumed [value], must be confirmed before
+implementation." Do not assume standard values without verification.
+
 **Checkpoint:**
 - [ ] All technical gaps clarified (or none existed)
+- [ ] External dependencies verified on real data, or marked as risks if unverifiable
 
 ## Phase 4: Create Tech Spec
 

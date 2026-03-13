@@ -58,6 +58,8 @@ actively proposes solutions and challenges weak answers.
 Read ALL files from `~/.claude/skills/project-knowledge/references/`.
 If directory missing or empty — warn user ("Project Knowledge не настроены — интервью пройдёт без контекста проекта. Для настройки используй project-init."), continue.
 
+Also read `docs/decisions-log.md` if it exists — note any ADR entries that may affect the feature's scope or approach. Reference these during the interview when relevant: "В нашем ADR-логе есть решение X — это влияет на то, как мы реализуем Y."
+
 These files are your context for the entire interview. Reference them when asking questions and proposing solutions.
 
 ### Phase 2: Cycle 1 — General Understanding

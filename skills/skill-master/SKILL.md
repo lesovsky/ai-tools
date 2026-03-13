@@ -226,6 +226,8 @@ Words like CRITICAL, MANDATORY, NEVER, IMPORTANT, MUST are anti-patterns.
 
 Skills, agents, and commands in ai-tools are portable — they work across different machines and environments. Environment-specific paths (`~/Git/notes/...`, `~/Projects/foo/bar.md`) belong in the target project's own documentation (e.g. `project-knowledge/references/deployment.md`), not in skill instructions. Skills should read paths from project documentation at runtime.
 
+This also applies to config file locations. If a skill uses a tool or script that requires user configuration, the config path must be owned by the script — not embedded in the skill instructions. The skill may document the default convention (e.g. "config is read by the script from its standard location"), but must not hardcode the path itself. The script is the single source of truth for where config lives and how to bootstrap it.
+
 ### Delegating Heavy Work
 
 If skill has context-heavy tasks (reviews, research, validation):
@@ -249,6 +251,7 @@ If skill has context-heavy tasks (reviews, research, validation):
 - [ ] All referenced files exist
 - [ ] No extra docs (README, CHANGELOG)
 - [ ] No hardcoded environment-specific paths (home dirs, local vaults, user-specific directories). Project-specific paths belong in the project's own documentation (e.g. project-knowledge), not in portable skills/agents/commands.
+- [ ] No hardcoded config file paths — if the skill uses scripts that require user config, the config location is owned by the script, not mentioned as a literal path in SKILL.md.
 - [ ] References contain only conditional content (not needed on every execution path)
 - [ ] References linked as action steps or with condition + contents (no passive links, no resource catalogs at end of file)
 - [ ] Uses positive instructions (not "don't do X")

@@ -60,6 +60,14 @@ Then ask adaptive questions to cover three areas:
 - If phased: how to group features, what's MVP
 - If migration: current system, data migration, risks, rollback plan
 
+**Architectural Boundaries (ask after stack is roughly clear):**
+- Are there modules/layers that should never depend on each other? (e.g. "business logic must not import UI code")
+- Are there areas of the codebase that are especially fragile or critical? ("red zones")
+- Any quality thresholds important to the team? (test coverage, max function complexity)
+- Any patterns that must be enforced? (e.g. "always go through service layer, never query DB from controller")
+
+These answers become invariants in Phase 2.5. If user has no strong opinions — propose sensible defaults based on the project type.
+
 ### 1.3 Interview Methodology
 
 **One question at a time.** Ask one question, wait for the answer, then form the next question based on the response.
@@ -104,11 +112,90 @@ TBD is acceptable for optional aspects.
 3. **Confirm with user:** show what you found, ask about gaps (deployment, missing pieces)
 4. Iterate until confirmed.
 
-### 2.3 Checkpoint
+### 2.3 Architectural Invariants
+
+Based on approved tech stack and architectural boundaries from Phase 1 — propose concrete, enforceable invariants and generate config files.
+
+**Step 1: Select tools based on stack**
+
+| Stack | Dependency rules | Complexity/style | Coverage |
+|---|---|---|---|
+| Node.js / TypeScript | dependency-cruiser | eslint (complexity, max-lines) | jest --coverage |
+| Python | import-linter | pylint / flake8 | pytest-cov |
+| Go | go-arch-lint | golangci-lint | go test -cover |
+| Java / Kotlin | ArchUnit | checkstyle | jacoco |
+| PHP | deptrac | phpmd | phpunit --coverage |
+| Rust | — | clippy | cargo tarpaulin |
+
+If stack is not in the list — choose the closest equivalent or skip invariant tooling, note the reason.
+
+**Step 2: Propose 3-5 invariants**
+
+Always propose (adapt names to the actual project structure):
+1. **Layer dependency rule** — e.g. `core/` must not import from `ui/`, `api/` must not import from `db/` directly
+2. **Complexity limit** — cyclomatic complexity ≤ 10 per function; file length ≤ 300 lines
+3. **Test coverage floor** — coverage must not drop below agreed threshold (suggest 70-80% for new projects)
+4. **Red zone protection** — if user identified fragile areas in Phase 1, name them explicitly as high-attention zones in docs
+
+Optional (propose if relevant):
+5. **No direct DB access outside repository layer** — if project has a clear data access pattern
+6. **Public API stability** — exported types/interfaces must not change without explicit intent
+
+Present proposed invariants to user. For each: what it enforces and why. User may adjust or drop any.
+
+**Step 3: Generate config files**
+
+For each approved invariant — generate the actual config file in the project root.
+
+Examples:
+
+`.dependency-cruiser.cjs` (Node.js):
+```js
+module.exports = {
+  forbidden: [
+    {
+      name: "no-core-to-ui",
+      from: { path: "^src/core/" },
+      to: { path: "^src/ui/" },
+      severity: "error"
+    }
+  ]
+};
+```
+
+`.import-linter` (Python):
+```ini
+[importlinter]
+root_package = myapp
+
+[importlinter:contract:layers]
+name = Enforce layered architecture
+type = layers
+layers =
+    myapp.api
+    myapp.services
+    myapp.db
+```
+
+`pyproject.toml` / `setup.cfg` complexity section (Python):
+```ini
+[pylint.design]
+max-complexity = 10
+max-line-length = 120
+```
+
+Add invariant checks to the project's lint/test scripts (package.json, Makefile, etc.) so they run automatically.
+
+**Step 4: Document in architecture.md**
+
+Record invariants under "Architectural Invariants" section (filled in Phase 3).
+
+### 2.4 Checkpoint
 
 Move to Phase 3 when:
 - Tech stack (frontend, backend, database, key dependencies) approved by user
 - Deployment platform and CI/CD approach agreed
+- Invariant tools selected and config files generated (or explicitly skipped with reason)
 - No open questions on technical choices
 
 ## Phase 3: Fill Documentation
@@ -132,6 +219,10 @@ Use Edit tool to replace template placeholders with real content. Content langua
 - External integrations
 - Data flow
 - Data model (fill if known, leave template sections if TBD)
+- **Architectural Invariants** — list of enforced rules from Phase 2.3:
+  - Each invariant: rule name, what it prevents, which tool enforces it, config file location
+  - Red zones: list of fragile/critical modules with explanation why they need special care
+  - If no invariants configured — note "not configured" with reason (e.g. "project too early-stage")
 
 **patterns.md** — fill git workflow section:
 - Branch structure, branch decision criteria

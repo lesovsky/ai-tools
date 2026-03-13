@@ -1,0 +1,30 @@
+# Tech Debt Register
+
+Known shortcuts, deferred improvements, and fragile areas. Updated after each feature.
+Reviewed at the start of tech-spec planning to avoid worsening existing debt.
+
+---
+
+## Active Debt
+
+<!-- Entry format:
+
+### [ID] Short Title
+
+**Added:** YYYY-MM-DD (feature: NNN-feat-name)
+**Severity:** Low | Medium | High
+**Area:** path/to/affected/module or component name
+
+**What:** Concrete description of the shortcut or known problem.
+
+**Why deferred:** Reason it wasn't fixed at the time.
+
+**Impact:** What breaks or degrades if this is ignored. Who is affected.
+
+**Fix:** Rough description of what a proper fix looks like.
+
+-->
+
+## Resolved Debt
+
+<!-- Move entries here when fixed. Add: **Resolved:** YYYY-MM-DD (feature: NNN-feat-name) -->

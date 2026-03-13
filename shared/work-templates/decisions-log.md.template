@@ -1,0 +1,26 @@
+# Architecture Decision Log
+
+Cross-feature log of key architectural decisions. Updated after each feature is finalized.
+Used by tech-spec planning and code research to avoid repeating mistakes and re-litigating settled choices.
+
+---
+
+<!-- Entry format:
+
+## [NNN-feat-name] Decision Title
+
+**Date:** YYYY-MM-DD
+**Feature:** [NNN-feat-name]
+**Status:** Accepted | Superseded by [NNN-feat-name]
+
+**Context:** 1-2 sentences: what problem or question prompted this decision.
+
+**Decision:** What was decided. Concrete and specific — no vague "we chose the best approach".
+
+**Rationale:** Why this option over alternatives. Key constraints or trade-offs.
+
+**Consequences:** What this means for future work. Constraints imposed on other features.
+
+**Tech debt introduced:** None / [description of shortcut taken and why]
+
+-->

@@ -75,6 +75,7 @@ Each feature lives in its own directory. `feature_base` is the full path prefix 
    After task complete:
    - Write entry to {feature_base}-decisions.md (follow template strictly: ~/.claude/shared/work-templates/decisions.md.template).
      Summary: 1-3 sentences describing what was done and key decisions. Link JSON reports for review details.
+     **Deviations field is mandatory:** if any shortcut was taken, any reviewer finding was deferred, or implementation differs from tech-spec — describe it explicitly. Do not write "Нет" unless truly no deviations occurred.
    - Message team lead: "Task {N} complete. decisions.md updated."
 
    feature_base: {feature_base}
@@ -114,7 +115,12 @@ Each feature lives in its own directory. `feature_base` is the full path prefix 
    Wait for a message from teammate "{teammate_name}" with git diff of changes.
 
    When you receive it:
-   1. Perform your review based on the changed files list and diff provided
+   1. Perform your review based on the changed files list and diff provided.
+      In addition to your standard review criteria, explicitly check for tech debt introduction:
+      - Are there shortcuts that should be logged? (hardcoded values, missing error handling, skipped edge cases)
+      - Does the implementation worsen any existing fragile areas?
+      - Is complexity increasing without justification?
+      If tech debt is introduced — mark it as a finding in your report with field `"tech_debt": true` and describe the shortcut and suggested proper fix.
    2. Write JSON report to: {feature_base}-task-{N}-{reviewer_name}-round{round}.json
    3. Send report path to teammate "{teammate_name}" via SendMessage
 

@@ -41,9 +41,11 @@ From orchestrator prompt:
 
 1. If `{feature_base}-code-research.md` exists — read it first. You are deepening existing research, not starting from scratch.
 2. Read `{feature_base}.md` for requirements context if it exists.
-3. Research the codebase using Glob, Grep, Read.
-4. If external libraries are involved and Context7 MCP is available — use `resolve-library-id` → `query-docs` for up-to-date API docs and best practices. If Context7 is unavailable — read README, CHANGELOG, or installed package files instead.
-5. Write results to `{feature_base}-code-research.md`.
+3. Read `docs/decisions-log.md` if it exists — note any ADR entries relevant to the feature area. These represent settled decisions: do not propose alternatives to them unless there is a compelling reason. Flag any ADRs that directly affect implementation approach in the **Potential Problems** section.
+4. Read `docs/tech-debt.md` (Active Debt section) if it exists — note any debt items in modules you will research. Mention them in **Potential Problems** with severity and suggested handling.
+5. Research the codebase using Glob, Grep, Read.
+6. If external libraries are involved and Context7 MCP is available — use `resolve-library-id` → `query-docs` for up-to-date API docs and best practices. If Context7 is unavailable — read README, CHANGELOG, or installed package files instead.
+7. Write results to `{feature_base}-code-research.md`.
 
 ## Sections
 

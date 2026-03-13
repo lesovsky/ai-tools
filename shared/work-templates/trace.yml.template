@@ -1,0 +1,35 @@
+feature: "{feature_base}"
+status: open          # open | closed
+started: "{date}"
+environment: staging  # local | test | staging | production
+
+symptom:
+  expected: >
+    [what was supposed to happen]
+  observed: >
+    [what actually happened]
+
+attempts: []
+# Each attempt is appended by the agent after the user tests the fix:
+#
+# - n: 1
+#   hypothesis: >
+#     Why we think this is the cause
+#   action:
+#     - "path/to/file.py: description of change"
+#   result: fail      # fail | pass
+#   observed: >
+#     What the user saw after testing
+
+root_cause: null
+# Filled by agent on /dev-debug-end:
+# What actually caused the issue (not a hypothesis — confirmed by a passing attempt)
+
+documentation_gap:
+  description: null
+  # What was unclear, missing, or misleading in the documentation
+  # that caused the agent to misimplement or misunderstand the feature
+  affected_artifacts: []
+  # List of artifact paths: user-spec, tech-spec, project-knowledge files
+  proposed_changes: null
+  # Brief description of what should change — full analysis done by dev-postmortem

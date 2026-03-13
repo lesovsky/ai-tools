@@ -85,14 +85,27 @@ For each item found:
 
 If no debt found — no changes needed, don't add empty entries.
 
-## Step 7: Archive
+## Step 7: Run Postmortem (if debug traces exist)
+
+Glob for `{feature_base}-trace*.yml`. If any closed traces found (`status: closed`) — spawn agent:
+
+```
+Agent: dev-postmortem
+Prompt: "Run postmortem for feature_base: {feature_base}"
+```
+
+Wait for the agent to complete before proceeding. Its documentation edits are included in the commit.
+
+If no closed traces found — skip this step silently.
+
+## Step 8: Archive
 
 Move feature directory `docs/features/{fname}/` → `docs/features/archive/{fname}/`
 (create `docs/features/archive/` if it doesn't exist).
 
-## Step 8: Commit & Report
+## Step 9: Commit & Report
 
-1. Commit all changes (PK updates, ADR log, tech debt register, archive move):
+1. Commit all changes (PK updates, ADR log, tech debt register, postmortem edits, archive move):
    ```
    docs: finalize {fname} — update PK, ADR log, tech debt register
    ```
@@ -102,6 +115,7 @@ Move feature directory `docs/features/{fname}/` → `docs/features/archive/{fnam
    - What PK files were updated and what changed
    - ADR entries added/updated (titles only)
    - Tech debt: N items added, M items resolved
+   - Postmortem: N traces analyzed, M doc changes applied (or "no traces found")
    - Feature archived to `docs/features/archive/{fname}/`
 
 ## Self-Verification
@@ -112,6 +126,7 @@ Move feature directory `docs/features/{fname}/` → `docs/features/archive/{fnam
 - [ ] PK files updated (only affected ones)
 - [ ] ADR log updated (docs/decisions-log.md)
 - [ ] Tech debt register updated (docs/tech-debt.md)
+- [ ] Postmortem ran (or skipped — no closed traces)
 - [ ] Feature archived to `docs/features/archive/{fname}/`
 - [ ] Changes committed
 - [ ] Report delivered to user

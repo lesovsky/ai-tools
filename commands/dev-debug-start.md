@@ -5,10 +5,6 @@ description: |
 
   Use when: manual testing reveals issues after a wave completes.
   Use when: "начнем сессию отладки", "debug start", "/dev-debug-start"
-allowed-tools:
-  - Read
-  - Write
-  - Glob
 ---
 
 # dev-debug-start — Start Debug Trace Session

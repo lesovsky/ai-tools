@@ -4,10 +4,6 @@ description: |
 
   Use when: the issue found during manual testing has been resolved.
   Use when: "сессия отладки завершена", "debug end", "/dev-debug-end"
-allowed-tools:
-  - Read
-  - Write
-  - Glob
 ---
 
 # dev-debug-end — Close Debug Trace Session
